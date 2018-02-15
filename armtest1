@@ -1,0 +1,42 @@
+class Robot : public frc::IterativeRobot {
+public:
+
+OI::OI()
+{
+	joy = new Joystick(1);
+    JoystickButton* button1 = new JoystickButton(joy, 1),
+                    button2 = new JoystickButton(joy, 2)
+   
+    }
+    
+   
+	Robot() {
+		m_robotDrive.SetExpiration(0.1);
+		m_timer.Start();
+	}
+
+void TeleopInit() override {}
+
+	void TeleopPeriodic() override {
+		// Drive with arcade style (use right stick)
+		m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
+    button1->whileHeld(new m_arm.Set(-0.5, 0.0));
+    button2->WhenPressed(new m_arm.Set(0.5, 0.0));
+    
+    
+	}
+  
+  
+  private:
+	// Robot drive system
+	frc::Spark m_left{3};
+	frc::Spark m_right{2};;
+	frc::DifferentialDrive m_robotDrive{m_left, m_right};
+
+	frc::Joystick m_stick{0};
+  frc::Spark m_arm{0}; 
+	frc::LiveWindow& m_lw = *frc::LiveWindow::GetInstance();
+	frc::Timer m_timer;
+};
+
+START_ROBOT_CLASS(Robot)
