@@ -1,0 +1,5 @@
+
+	void RobotInit()
+	{
+		lw = LiveWindow::GetInstance();
+	}
