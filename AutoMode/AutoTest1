@@ -1,0 +1,26 @@
+
+	void AutonomousInit() //This method is called once each time the robot enters Autonomous
+	{
+		autoLoopCounter = 0;
+	}
+
+	void AutonomousPeriodic() /* This method is called each time the robot receives a 
+	* packet instructing the robot to be in Autonomous Enabled mode (approximately every 20ms)
+	* This means that code in this method should return in 20 ms or less (no delays or loops)
+	*/
+	{
+		/* This example checks if the loop counter has reached 100
+		* (approximately 2 seconds) THis is a fairly simple example and is not recommended for actual
+		* autonomous routines, because delayed or missed packets will significantly affect the timing
+		* of this program
+		*/
+		if(autoLoopCounter < 100)
+		{
+			myRobot.Drive(-0.5, 0.0); /* If autoLoopCounter has not yet reached 100,
+			* this instructs the robot to drive forward at half speed, and increment the counter
+			**/
+			autoLoopCounter++;
+		} else {
+			myRobot.Drive(0.0, 0.0); // If autoLoopCounter has reached 100, this stops the robot
+		}
+	}
