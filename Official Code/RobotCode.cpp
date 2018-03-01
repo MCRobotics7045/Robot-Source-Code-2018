@@ -1,14 +1,3 @@
-/*----------------------------------------------------------------------------*/
-
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-
-/* the project.                                                               */
-
-/*----------------------------------------------------------------------------*/
 
 #include <Drive/DifferentialDrive.h>
 #include <IterativeRobot.h>
@@ -21,8 +10,8 @@
 
 class Robot : public frc::IterativeRobot {
 
-	Spark *armspark;
-	Spark *shovelspark;
+	Spark *flipspark;
+	Spark *liftspark;
 
 public:
 
@@ -30,8 +19,13 @@ public:
 
 		m_robotDrive.SetExpiration(0.1);
 		m_timer.Start();
-		armspark = new Spark(0);
-		shovelspark = new Spark(1);
+		flipspark = new Spark(0);
+		liftspark = new Spark(1);
+		//set safeties on the arm motors so they don't burn out
+		flipspark->SetSafetyEnabled(true);
+		liftspark->SetSafetyEnabled(true);
+		flipspark->SetExpiration(10);
+		liftspark->SetExpiration(10);
 	}
 
 
@@ -42,13 +36,28 @@ public:
 
 	void AutonomousPeriodic() override {
 		// Drive for 2 seconds
-		if (m_timer.Get() < 2.0) {
+		if (m_timer.Get() < 5.0) {
 			// Drive forwards half speed
 			m_robotDrive.ArcadeDrive(-0.5, 0.0);
-		} else {
-			// Stop robot
+		} else 
+		{	if(5.0 < m_timer.Get() < 9.0) {
+			 // Stop robot
 			m_robotDrive.ArcadeDrive(0.0, 0.0);
-		}
+			//run motor to flip up arm
+			flipspark->Set((double)0.6);
+			}/* timer nine seconds curly brace */ else 
+			{	if (9.0 < m_timer.Get() < 9.2) {
+				//drive backwards to fell arm
+				flipspark->Set((double)0.0);
+				liftspark->Set((double)0.3);
+				m_robotDrive.ArcadeDrive(0.5, 0.0);
+				} else
+				{ //stop the robot, hopefully ahead of the auto line
+				   m_robotDrive.ArcadeDrive(0.0, 0.0)
+				}// the last curly brace in this forsaken auto code I SWEAR
+			 
+			
+		}//drive forward end curly brace
 
 	}
 
@@ -60,37 +69,37 @@ public:
 		// TOASTER BOT DRIVES
 		m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
 
-		//THINE ARM SHALL RAISE
-
+		//THINE ARM SHALL RAISE BUT LIKE WE ALREADY FLIPPED OUT ba-dum tiss! puns are 30% of my personality guys
+		
 		if ( m_stick.GetTrigger() == 1){
-		// if trigger pressed, drive arm motor at hundredth speed
-			armspark->Set((double)0.6);
+		// if trigger pressed, drive arm motor at mild speed
+			flipspark->Set((double)0.6);
 		}
 		else
 		{	 if (m_stick.GetRawButton(3)== 1)
 				{
-				armspark->Set((double)-0.4);
+				flipspark->Set((double)-0.4);
 				}
 			else {
-				armspark->Set((double)0.0);
+				flipspark->Set((double)0.0);
 				}//curly brace for button 3
 		}//curly brace for Trigger
 
 
-//SHOVEL TIME
+//lift TIME
 		if (m_stick.GetRawButton(9)== 1)
-		{//lower the shovel
-			shovelspark->Set((double)-1.0);
+		{//lower the arm
+			liftspark->Set((double)-1.0);
 		}
 
 		else {
 			if (m_stick.GetRawButton(10)== 1)
 			{
-						//raise the shovel
-				shovelspark->Set((double)1.0);
+						//raise the arm, hopefully with power cubicle
+				liftspark->Set((double)1.0);
 			}
 			else{
-				shovelspark->Set((double)0.0);
+				liftspark->Set((double)0.0);
 			}//curly brace for button 10 else
 		}//curly brace for button 9 else
 
